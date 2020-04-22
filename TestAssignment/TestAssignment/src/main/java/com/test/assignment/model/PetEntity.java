@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PetEntity implements Serializable {
 
-	private Integer id;
+	private Long id;
 	
 	private String name;
 	

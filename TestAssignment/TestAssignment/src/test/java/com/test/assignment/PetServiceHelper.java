@@ -1,5 +1,7 @@
 package com.test.assignment;
 
+import static io.restassured.RestAssured.given;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.test.assignment.model.CategoryEntity;
@@ -11,38 +13,35 @@ import io.restassured.RestAssured;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import static io.restassured.RestAssured.*;
-
 @Slf4j
 @AllArgsConstructor
 public class PetServiceHelper {
 
 	private ObjectMapper objectMapper;
 	
-	private final String baseUrl = "https://petstore.swagger.io/";
+	private final String baseUrl = "https://petstore.swagger.io/v2/pet";
+	
 	
 	@Step("Creating New Pet")
-	public void createPet() throws JsonProcessingException 
-	{
-		PetEntity pet = this.loadTestPet();		
-		String petJson = objectMapper.writeValueAsString(pet);
-		log.debug(petJson);
-		System.out.println(petJson);
-		
+	public PetEntity createPet(String petJson) throws JsonProcessingException {
 		RestAssured.baseURI = baseUrl;
 		
-		given().body(petJson).header("Content-Type", "application/json").
+		String response = given().body(petJson).header("Content-Type", "application/json").
 		
-		when().post("v2/pet").
+		when().post("").
 		
-		then().assertThat().statusCode(200);
+		then().assertThat().statusCode(200).extract().response().asString();
+		
+		PetEntity pet = objectMapper.readValue(response, PetEntity.class);
+		
+		return pet;
 	}
 	
 	@Step("Load Test Data for a Pet")
 	public PetEntity loadTestPet() {
 		
-		CategoryEntity category = new CategoryEntity(1, "Dogs");
-		TagEntity tag = new TagEntity(1, "homie");
+		CategoryEntity category = new CategoryEntity(1l, "Dogs");
+		TagEntity tag = new TagEntity(1l, "homie");
 		
 		PetEntity pet = new PetEntity();
 		pet.setName("tomy");

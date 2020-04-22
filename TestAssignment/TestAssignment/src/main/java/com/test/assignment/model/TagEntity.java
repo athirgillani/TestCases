@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TagEntity implements Serializable {
 
-	private Integer id;
+	private Long id;
 	
 	private String name;
 }
