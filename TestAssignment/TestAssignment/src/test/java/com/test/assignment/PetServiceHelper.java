@@ -10,6 +10,7 @@ import com.test.assignment.model.TagEntity;
 
 import io.qameta.allure.Step;
 import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +36,51 @@ public class PetServiceHelper {
 		PetEntity pet = objectMapper.readValue(response, PetEntity.class);
 		
 		return pet;
+	}
+	
+	@Step("Retrieve Pet")
+	public PetEntity retrievePet(Long petId) throws JsonProcessingException
+	{
+		RestAssured.baseURI = baseUrl;
+		
+		String response = given().when().get("/" + petId).
+		
+		then().assertThat().statusCode(200).extract().response().asString();
+		
+		PetEntity pet = objectMapper.readValue(response, PetEntity.class);
+		
+		return pet;
+	}
+	
+	@Step("Update Pet")
+	public PetEntity updatePet(Long petId, String name, String status) throws JsonProcessingException
+	{
+		RequestSpecification request = given().header("Content-Type", "application/x-www-form-urlencoded");
+		if (name != null) {
+			request.queryParam("name", name);
+		}
+		if (status != null) {
+			request.queryParam("status", status);
+		}
+				
+		String response = request.when().post("/" + petId).
+				
+		then().assertThat().statusCode(200).extract().response().asString();
+				
+		PetEntity pet = objectMapper.readValue(response, PetEntity.class);
+				
+		return pet;
+	}
+	
+	@Step("Remove Pet")
+	public void deletePet(Long petId) {
+		RestAssured.baseURI = baseUrl;
+		
+		given().when().delete("/" + petId).		
+		then().assertThat().statusCode(200);
+		
+		given().when().get("/" + petId).		
+		then().assertThat().statusCode(404);
 	}
 	
 	@Step("Load Test Data for a Pet")
